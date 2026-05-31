@@ -5,10 +5,11 @@ export default function ProgressTab({ state, update }) {
   const canvasRef = useRef(null);
   const { completedWorkouts, weight } = state;
 
-  // Count completed workouts
+  // Count completed workouts — Wednesday (day 3) is scheduled rest, excluded from totals
   let total = 0, done = 0;
   for (let w = 0; w < 12; w++) {
     for (let d = 0; d < 7; d++) {
+      if (d === 3) continue; // Wednesday always rest — never counts against streak
       total++;
       if (completedWorkouts[`${w}-${d}`]) done++;
     }
@@ -118,17 +119,21 @@ export default function ProgressTab({ state, update }) {
     ctx.fillText(`${last.v} lbs`, toX(entries.length-1), toY(last.v)-8);
   }, [weight]);
 
-  // Streak dots
+  // Streak dots — Wednesday circles are purple (scheduled rest = always on track)
   const streakDots = [];
   for (let w = 0; w < 12; w++) {
     for (let d = 0; d < 7; d++) {
       const key = `${w}-${d}`;
+      const isRest = d === 3;
       const isCurrent = w===state.currentWeek && d===state.currentDay;
       const isDone = completedWorkouts[key];
       streakDots.push(
         <div key={key} style={{
-          width:18, height:18, borderRadius:5, flexShrink:0,
-          background: isDone ? '#4caf7d' : isCurrent ? '#f4c430' : 'var(--border)'
+          width:18, height:18,
+          borderRadius: isRest ? '50%' : 5,
+          flexShrink:0,
+          background: isRest ? '#3d2a6e' : isDone ? '#4caf7d' : isCurrent ? '#f4c430' : 'var(--border)',
+          border: isRest ? '1px solid #7c5cbf' : 'none',
         }} />
       );
     }
@@ -177,7 +182,7 @@ export default function ProgressTab({ state, update }) {
       {/* Streak */}
       <div style={s.card}>
         <div style={s.cardTitle}>📅 84-DAY STREAK</div>
-        <div style={s.sub}>Green = done · Gold = today · Gray = upcoming</div>
+        <div style={s.sub}>🟢 Done · 🟡 Today · 🟣 Rest day (always on track) · ⬜ Upcoming</div>
         <div style={{ display:'flex', flexWrap:'wrap', gap:4, marginTop:8 }}>{streakDots}</div>
       </div>
     </div>
