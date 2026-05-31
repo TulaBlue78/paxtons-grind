@@ -83,29 +83,51 @@ export default function WorkoutTab({ state, update }) {
       </div>
 
       {/* Exercises */}
-      <div style={s.card}>
-        <div style={s.cardTitle}>{workout.label}</div>
-        {workout.exercises.map((ex, i) => {
-          const done = completedExercises[`${dayKey}-${i}`];
-          return (
-            <div key={i} style={{ ...s.exRow, opacity: done ? 0.55 : 1 }}>
-              <div style={s.exLeft}>
-                {ex.kb && <span style={s.kbBadge}>KB</span>}
-                {ex.knee && <span style={s.kneeBadge}>KNEE</span>}
-                <span style={{ ...s.exName, textDecoration: done ? 'line-through' : 'none' }}>{ex.name}</span>
-              </div>
-              <span style={s.exSets}>{ex.sets}</span>
-              <button onClick={() => toggleExercise(i)}
-                style={{ ...s.checkBtn, background: done ? '#4caf7d' : 'transparent', borderColor: done ? '#4caf7d' : 'var(--border)', color: done ? '#fff' : 'transparent' }}>
-                ✓
-              </button>
-            </div>
-          );
-        })}
-        {allDone && (
-          <div style={s.allDone}>✅ WORKOUT COMPLETE!</div>
-        )}
-      </div>
+      {workout.rest ? (
+        <div style={s.restCard}>
+          <div style={s.restEmoji}>😴</div>
+          <div style={s.restTitle}>REST DAY</div>
+          <div style={s.restMsg}>Today is yours. No workout, no guilt.</div>
+          <div style={s.restSub}>Rest and recovery is where your muscles actually grow. Every great athlete treats their off day as seriously as their training day. Eat well, sleep 8–9 hours, and let your body do its thing.</div>
+          <div style={s.restTips}>
+            <div style={s.restTip}>💧 Still hit your water goal</div>
+            <div style={s.restTip}>🥩 Still hit your 6 protein wins</div>
+            <div style={s.restTip}>😴 Get to bed on time tonight</div>
+            <div style={s.restTip}>🚶 A walk is fine — nothing intense</div>
+          </div>
+        </div>
+      ) : (
+        <>
+          {workout.note && (
+            <div style={s.practiceNote}>{workout.note}</div>
+          )}
+          <div style={s.card}>
+            <div style={s.cardTitle}>{workout.label}</div>
+            {workout.exercises.map((ex, i) => {
+              const done = completedExercises[`${dayKey}-${i}`];
+              return (
+                <div key={i} style={{ ...s.exRow, opacity: done ? 0.55 : 1 }}>
+                  <div style={s.exLeft}>
+                    {ex.kb && <span style={s.kbBadge}>KB</span>}
+                    {ex.db && <span style={s.dbBadge}>DB</span>}
+                    {ex.knee && <span style={s.kneeBadge}>KNEE</span>}
+                    <div>
+                      <div style={{ ...s.exName, textDecoration: done ? 'line-through' : 'none' }}>{ex.name}</div>
+                      {ex.weight && <div style={s.exWeight}>{ex.weight}</div>}
+                    </div>
+                  </div>
+                  <span style={s.exSets}>{ex.sets}</span>
+                  <button onClick={() => toggleExercise(i)}
+                    style={{ ...s.checkBtn, background: done ? '#4caf7d' : 'transparent', borderColor: done ? '#4caf7d' : 'var(--border)', color: done ? '#fff' : 'transparent' }}>
+                    ✓
+                  </button>
+                </div>
+              );
+            })}
+            {allDone && <div style={s.allDone}>✅ WORKOUT COMPLETE!</div>}
+          </div>
+        </>
+      )}
 
       {/* Week tip */}
       <div style={s.card}>
@@ -148,12 +170,22 @@ const s = {
   exRow: { display:'flex', alignItems:'center', gap:8, padding:'9px 0', borderBottom:'1px solid var(--border)', transition:'opacity 0.2s' },
   exLeft: { flex:1, display:'flex', alignItems:'center', gap:6, flexWrap:'wrap' },
   exName: { fontSize:'0.88rem', fontWeight:500 },
-  kbBadge: { fontSize:'0.65rem', background:'rgba(255,107,53,0.2)', color:'#ff6b35', border:'1px solid rgba(255,107,53,0.4)', borderRadius:5, padding:'1px 5px', letterSpacing:'0.5px' },
-  kneeBadge: { fontSize:'0.65rem', background:'rgba(76,175,125,0.2)', color:'#4caf7d', border:'1px solid rgba(76,175,125,0.4)', borderRadius:5, padding:'1px 5px', letterSpacing:'0.5px' },
+  kbBadge: { fontSize:'0.65rem', background:'rgba(255,107,53,0.2)', color:'#ff6b35', border:'1px solid rgba(255,107,53,0.4)', borderRadius:5, padding:'1px 5px', letterSpacing:'0.5px', flexShrink:0 },
+  dbBadge: { fontSize:'0.65rem', background:'rgba(100,160,255,0.2)', color:'#64a0ff', border:'1px solid rgba(100,160,255,0.4)', borderRadius:5, padding:'1px 5px', letterSpacing:'0.5px', flexShrink:0 },
+  kneeBadge: { fontSize:'0.65rem', background:'rgba(76,175,125,0.2)', color:'#4caf7d', border:'1px solid rgba(76,175,125,0.4)', borderRadius:5, padding:'1px 5px', letterSpacing:'0.5px', flexShrink:0 },
+  exWeight: { fontSize:'0.7rem', color:'var(--muted)', marginTop:1 },
   exSets: { fontSize:'0.78rem', color:'var(--accent)', fontWeight:600, background:'var(--surface)', border:'1px solid var(--border)', borderRadius:8, padding:'3px 8px', whiteSpace:'nowrap' },
   checkBtn: { width:30, height:30, borderRadius:8, border:'2px solid', cursor:'pointer', fontSize:'0.9rem', fontWeight:700, transition:'all 0.15s', flexShrink:0 },
   allDone: { textAlign:'center', padding:12, color:'#4caf7d', fontFamily:'Bebas Neue', fontSize:'1.1rem', letterSpacing:'2px', marginTop:8 },
   tip: { background:'rgba(244,196,48,0.07)', borderLeft:'3px solid var(--accent)', borderRadius:'0 10px 10px 0', padding:'10px 12px', fontSize:'0.83rem', lineHeight:1.5 },
+  practiceNote: { background:'rgba(244,196,48,0.08)', border:'1px solid rgba(244,196,48,0.25)', borderRadius:12, padding:'10px 14px', marginBottom:12, fontSize:'0.82rem', color:'var(--accent)', lineHeight:1.4 },
+  restCard: { background:'var(--card)', border:'1px solid var(--border)', borderRadius:14, padding:24, marginBottom:12, textAlign:'center' },
+  restEmoji: { fontSize:'3rem', marginBottom:10 },
+  restTitle: { fontFamily:'Bebas Neue', fontSize:'2rem', letterSpacing:'4px', color:'var(--accent)', marginBottom:8 },
+  restMsg: { fontSize:'1rem', fontWeight:600, color:'var(--text)', marginBottom:10 },
+  restSub: { fontSize:'0.82rem', color:'var(--muted)', lineHeight:1.6, marginBottom:16 },
+  restTips: { display:'flex', flexDirection:'column', gap:8, textAlign:'left' },
+  restTip: { background:'var(--surface)', border:'1px solid var(--border)', borderRadius:10, padding:'10px 14px', fontSize:'0.84rem', color:'var(--text)' },
   sportRow: { display:'flex', alignItems:'center', gap:8, padding:'8px 0', borderBottom:'1px solid var(--border)' },
   removeBtn: { background:'none', border:'none', color:'var(--red)', cursor:'pointer', fontSize:'0.85rem', padding:'2px 6px' },
   input: { flex:1, background:'var(--surface)', border:'1px solid var(--border)', borderRadius:10, padding:'9px 12px', color:'var(--text)', fontFamily:'DM Sans', fontSize:'0.85rem', outline:'none' },
